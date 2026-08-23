@@ -1,51 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class POPSys : MonoBehaviour
+public class PopSys : MonoBehaviour
 {
-    public GameObject clouds;
-    public GameObject trash;
-    public float minY = 0f;
-    public float maxY = 0.6f;
-    public float minspawnInterval = 1f;
-    public float maxspawnInterval = 5f;
-    public float minspawnIntT = 1f;
-    public float maxspawnIntT = 3f;
-    public float spawnX = 1f;
-    public float spawnY = -0.309f;
-    // Start is called before the first frame update
+    //ゴミ箱のオブジェクトを取得
+    public GameObject trashCan;
+    //ゴミ箱が出てくる座標の指定(縦)
+    float popY = -0.3f;
+    //ゴミ箱が出てくる間隔の最大値を指定
+    public float popInterval = 1.2f;
+    //一度に出るゴミ箱の数を指定
+    public int popCount = 4;
+
+    //ランダムな間隔でゴミ箱を出す処理
     void Start()
     {
-        StartCoroutine(SpawnClouds());
-        StartCoroutine(SpawnTrash());
+        InvokeRepeating("PopTrashCan", 0f, popInterval);
     }
 
-    // Update is called once per frame
-    System.Collections.IEnumerator SpawnClouds()
+    void PopTrashCan()
     {
-        while (true) { 
-            float delay = Random.Range(minspawnInterval, maxspawnInterval);
-            yield return new WaitForSeconds(delay);
-            float y = Random.Range(minY, maxY);
-            Vector3 spawnPos = new Vector3(spawnX, y, 0);
-            Instantiate(clouds, spawnPos, Quaternion.identity);
-        }
-    }
-    System.Collections.IEnumerator SpawnTrash()
-    {
-        while (true)
+        for (int i = 0; i < popCount; i++)
         {
-            if (!UISys.GameOver) { 
-                float delayT = Random.Range(minspawnIntT, maxspawnIntT);
-                yield return new WaitForSeconds(delayT);
-                Vector3 spawnPosT = new Vector3(spawnX, spawnY, 0);
-                Instantiate(trash, spawnPosT, Quaternion.identity);
-            }
-            else
-            {
-                yield return null;
-            }
+            //ゴミ箱の出現座標をランダムに指定
+            float randomX = Random.Range(1, 2.5f);
+            Vector3 popPosition = new Vector3(randomX, popY, 0f);
+            //ゴミ箱を生成
+            Instantiate(trashCan, popPosition, Quaternion.identity);
         }
     }
 }

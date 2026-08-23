@@ -13,12 +13,17 @@ public class PlayerMov : MonoBehaviour
     public float groundChkR = 0.1f;
     private Animator animator;
     private bool isTrash = false;
+    //プレイヤーのAudio
+    public AudioClip running;
+    public AudioClip jump;
+    private AudioSource audioSource;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         transform.position = new Vector3(-0.429f, -0.209f, 0f);
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -53,5 +58,28 @@ public class PlayerMov : MonoBehaviour
     private bool InScreenTapped()
     {
         return Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began;
+    }
+    //プレイヤーの音関係
+    void FixedUpdate()
+    {
+        //地面に降れているかどうかの判定を行い、地面に降れている場合は走る音を鳴らす
+        if (isGround)
+        {
+            if (!audioSource.isPlaying)
+            {
+                audioSource.clip = running;
+                audioSource.Play();
+            }
+        }
+        else
+        {
+            audioSource.Stop();
+        }
+
+        //地面に触れた瞬間、離れた瞬間に音を鳴らす
+        if (!isGround && rb.linearVelocity.y > 0)
+        {
+            audioSource.PlayOneShot(jump);
+        }
     }
 }
