@@ -4,26 +4,29 @@ using UnityEngine;
 
 public class PlayerMov : MonoBehaviour
 {
+    public AudioClip jumpClip;
+    public AudioClip runningClip;
+    public AudioSource jumpSource;
+    public AudioSource runningSource;
+
     public float JumpForce = 2f;
     private Rigidbody2D rb;
-    private bool isGround = true;
+    public bool isGround = true;
     public LayerMask groundLayer;
     public LayerMask trashLayer;
     public Transform groundChk;
     public float groundChkR = 0.1f;
     private Animator animator;
     private bool isTrash = false;
-    //プレイヤーのAudio
-    public AudioClip running;
-    public AudioClip jump;
-    private AudioSource audioSource;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         transform.position = new Vector3(-0.429f, -0.209f, 0f);
-        audioSource = GetComponent<AudioSource>();
+        runningSource.clip = runningClip;
+        runningSource.loop = true;
     }
 
     // Update is called once per frame
@@ -34,52 +37,42 @@ public class PlayerMov : MonoBehaviour
             isTrash = Physics2D.OverlapCircle(groundChk.position, groundChkR, trashLayer);
         }
         isGround = Physics2D.OverlapCircle(groundChk.position, groundChkR, groundLayer);
-        if (isGround && (Input.GetMouseButtonDown(0) || InScreenTapped()))
+        if ((Input.GetMouseButtonDown(0) || InScreenTapped()) && (isGround || isTrash))
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, JumpForce);
+            jumpSource.PlayOneShot(jumpClip);
         }
-        else if (isTrash && (Input.GetMouseButtonDown(0) || InScreenTapped()))
+        if (isGround)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, JumpForce);
-        }
-            if (isGround)
-        {
+            if (!runningSource.isPlaying)  
+            {
+                Debug.Log($"runningSource instance ID: {runningSource.GetInstanceID()}");
+    Debug.Log($"jumpSource instance ID: {jumpSource.GetInstanceID()}");
+    Debug.Log($"Same? {runningSource == jumpSource}");
+    Debug.Log($"runningSource.clip: {runningSource.clip}");
+    Debug.Log($"runningClip: {runningClip}");
+    
+    runningSource.Play();
+    
+    Debug.Log($"再生後 isPlaying: {runningSource.isPlaying}");
+
+            }
             animator.SetBool("isJump", false);
         }
         else
         {
             animator.SetBool("isJump", true);
+            runningSource.Stop();
         }
         if(transform.position.x < -0.46f)
         {
             UISys.GameOver = true;
         }
+
     }
     private bool InScreenTapped()
     {
         return Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began;
     }
-    //プレイヤーの音関係
-    void FixedUpdate()
-    {
-        //地面に降れているかどうかの判定を行い、地面に降れている場合は走る音を鳴らす
-        if (isGround)
-        {
-            if (!audioSource.isPlaying)
-            {
-                audioSource.clip = running;
-                audioSource.Play();
-            }
-        }
-        else
-        {
-            audioSource.Stop();
-        }
-
-        //地面に触れた瞬間、離れた瞬間に音を鳴らす
-        if (!isGround && rb.linearVelocity.y > 0)
-        {
-            audioSource.PlayOneShot(jump);
-        }
-    }
+    
 }
