@@ -15,10 +15,30 @@ public class title : MonoBehaviour
     public Sprite back;
     public Sprite jon;
     public Sprite joff;
+    //音量調整用のスライダー
+    public Slider volumeSlider;
+    //音量調整用の変数
+    public float volume;
+    //音量調整のためのAudioSource
+    private AudioSource audioSource;
+
     public void Start()
     {
         jumpTrue = PlayerPrefs.GetInt("Jump", 0);
         SettingPanel.SetActive(false);
+        volume = PlayerPrefs.GetFloat("Volume", 1.0f);
+        audioSource = GetComponent<AudioSource>();
+        volumeSlider.value = volume;
+        audioSource.volume = volume;
+        volumeSlider.onValueChanged.AddListener(PlaySound);
+    }
+    public void PlaySound(float value)
+    {
+        volume = volumeSlider.value;
+        audioSource.volume = volume;
+        PlayerPrefs.SetFloat("Volume", volume);
+        //AudioSourceに入ってる音を再生する
+        audioSource.Play();
     }
     public void MoveScene()
     {

@@ -30,10 +30,10 @@ public class PauseSys : MonoBehaviour
     
     public void PauseGame()
     {
+        pauseBtn.SetActive(false);
         scoreP.text = UISys.score.ToString();
         HiscoreP.text = UISys.Hiscore.ToString();
         pausePanel.SetActive(true);
-        pauseBtn.SetActive(false);
         Time.timeScale = 0f;
     }
     public void RestartGame()

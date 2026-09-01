@@ -16,6 +16,13 @@ public class UISys : MonoBehaviour
     public Text scoretxG;
     public Text HiScoretx;
     public static int Hiscore;
+    
+    //AudioŠÖŒW
+    public AudioSource audioSource;
+    public AudioClip pushClip;
+    public AudioClip stopClip;
+    public float volume;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +32,9 @@ public class UISys : MonoBehaviour
         gvPanel.SetActive(false);
         Hiscore = PlayerPrefs.GetInt("HighScore", 0);
         HiScoretx.text = Hiscore.ToString();
+        audioSource = GetComponent<AudioSource>();
+        volume = PlayerPrefs.GetFloat("Volume", 1.0f);
+        audioSource.volume = volume;
     }
 
     // Update is called once per frame
@@ -46,6 +56,7 @@ public class UISys : MonoBehaviour
             scoretxG.text = score.ToString();
             CheckHighScore();
         }
+        audioSource.volume = volume;
     }
  
     
@@ -69,5 +80,15 @@ public class UISys : MonoBehaviour
             PlayerPrefs.Save();
         }
         HiScoretx.text = Hiscore.ToString();
+    }
+
+    public void StopSound() {
+        audioSource.clip = stopClip;
+        audioSource.Play();
+    }
+    public void PushSound()
+    {
+        audioSource.clip = pushClip;
+        audioSource.Play();
     }
 }

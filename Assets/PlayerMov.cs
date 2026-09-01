@@ -9,6 +9,8 @@ public class PlayerMov : MonoBehaviour
     public AudioSource jumpSource;
     public AudioSource runningSource;
 
+    public float volume;
+
     public float JumpForce = 2f;
     private Rigidbody2D rb;
     public bool isGround = true;
@@ -27,6 +29,7 @@ public class PlayerMov : MonoBehaviour
         transform.position = new Vector3(-0.429f, -0.209f, 0f);
         runningSource.clip = runningClip;
         runningSource.loop = true;
+        volume = PlayerPrefs.GetFloat("Volume", 1.0f);
     }
 
     // Update is called once per frame
@@ -68,11 +71,18 @@ public class PlayerMov : MonoBehaviour
         {
             UISys.GameOver = true;
         }
+        jumpSource.volume = volume;
+        runningSource.volume = volume;
 
     }
     private bool InScreenTapped()
     {
         return Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began;
+    }
+
+    public void StopAllSound()
+    {
+        runningSource.Stop();
     }
     
 }
